@@ -1,0 +1,25 @@
+#ifndef __MONAD__H
+#define __MONAD__H
+
+#include <functional>
+
+template <class A, class B, template <class> class C>
+C<B> bind(std::function<C<B>(A)>, C<A>);
+
+template <class A, template <class> class C>
+C<A> lift(A);
+
+namespace Monad{
+        template <class A, class B, template<class> class M>
+        M<B> liftM(std::function<A(B)> f, M<A> ma){
+                using namespace std;
+                //std::function<M<B>(A)> df = [&f](auto x){ return lift(f(x)); };
+                return bind(
+                                function<M<B>(A)>(
+                                        [&f](auto x){ return lift(f(x)); }
+                                        ), 
+                                ma);
+        }
+};
+
+#endif

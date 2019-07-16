@@ -1,0 +1,41 @@
+#ifndef __MAYBE__H
+#define __MAYBE__H
+
+#include <functional>
+
+template <class T>
+struct Maybe{
+        private:
+                const bool _exists;
+                union {
+                        void* nothing;
+                        T data;
+
+                };
+         public:
+                const bool exists(){
+                        return _exists;
+                }
+
+                Maybe(): _exists(false), nothing(nullptr) { }
+                Maybe(T t): _exists(true), data(t) { }
+
+                T extract(){
+                        if (!_exists) throw -1;
+                        return data;
+                }
+};
+
+template <class A, class B>
+Maybe<B> bind(std::function<Maybe<B>(A)> f, Maybe<A> x){
+        if (!x.exists()) return Maybe<B>();
+        return f(x.extract());
+}
+
+template <class A>
+Maybe<A> lift(A a){
+        return Maybe<A>(a);
+}
+
+
+#endif
